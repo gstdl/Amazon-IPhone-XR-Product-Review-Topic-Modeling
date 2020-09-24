@@ -30,7 +30,7 @@ Complains received will be pre-sorted based on model output and employees can qu
 Keep in mind that this is an unfinished project. It contains code only. Please expect the following updates to this repository:
 
 1. Documentation
-2. Topic Modeling using other methods
+2. Topic Modeling using other methods (Low priority)
 3. A deployed web app in Heroku
 
 You can check this [Kanban Board](https://github.com/users/gstdl/projects/1) for more details.
@@ -41,7 +41,7 @@ The data used in this project is **scraped** from [Amazon India's website](https
 
 **Why am I using review data when the practical example is customer complains?**
 
-> I'm using review data because complain data is not an easy data obtain and the procedure to build the model will be almost the same.
+> I'm using review data because complaint data is not easy to obtain and the procedure to build the model will be almost the same.
 
 <!-- **Can I use this data for my personal projects?**
 
