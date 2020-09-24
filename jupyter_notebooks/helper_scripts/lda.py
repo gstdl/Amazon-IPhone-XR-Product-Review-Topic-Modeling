@@ -6,11 +6,14 @@ import matplotlib.pyplot as plt
 from wordcloud import WordCloud
 from tqdm import tqdm
 
+plt.rcParams["figure.figsize"] = (22, 10)
+plt.style.use("seaborn-whitegrid")
+
 
 class LDA:
     def __init__(self, training_samples):
         self.texts = training_samples
-        self.docs = [data.split() for data in texts]
+        self.docs = [data.split() for data in self.texts]
         self.dictionary = corpora.Dictionary(self.docs)
         self.bow_corpus = [self.dictionary.doc2bow(doc) for doc in self.docs]
 
@@ -70,7 +73,10 @@ class LDA:
             self.visualize_topics_ = 'Set tuning parameter in fit function to "False" to visualize LDA result!'
             return self.coherence_score_
         if predict_training_samples:
-            self.training_samples_predict_proba_, self.training_samples_prediction_ = self.predict(self.texts, True)
+            (
+                self.training_samples_predict_proba_,
+                self.training_samples_prediction_,
+            ) = self.predict(self.texts, True)
 
     def print_output(self):
         for idx, topic in self.model.print_topics(-1):
@@ -164,6 +170,9 @@ class LDA:
                 pred_proba[i] = proba
             predict_proba.append(pred_proba)
             predictions.append(np.argmax(pred_proba))
+        else:
+            predict_proba = np.array(predict_proba)
+            predictions = np.array(predictions)
         if sample_data_type == str:
             predict_proba = predict_proba[0]
             predictions = predictions[0]
@@ -172,5 +181,42 @@ class LDA:
         else:
             return predictions
 
-    def generate_topic_word_cloud(self, topics, topic_names):
-        pass
+    def generate_topic_word_cloud(self, topics="all", topic_names=None):
+        assert (
+            hasattr(topics, "__iter__")
+            or topics.lower().strip() == "all"
+            or type(topics) == int
+        ), 'topics only accepts "all", an integer, or an iterable'
+        if type(topics) == int:
+            topics = [topics]
+        elif topics.lower().strip() == "all":
+            topics = np.unique(self.training_samples_prediction_)
+        z = [[i] for i in topics]
+
+        if topic_names != None:
+            assert (
+                hasattr(topic_names, "__iter__") or type(topic_names) == str
+            ), "topic_names must be an a strin, an iterable or None"
+            if type(topic_names) == str:
+                assert (
+                    len(topics) == 1
+                ), "Only accept integers for topics when topic_names data type is a string"
+                topic_names = [topic_names]
+            else:
+                assert len(topics) == len(
+                    topic_names
+                ), "topics and topic_names length must be the same."
+            z = zip(topics, topic_names)
+
+        for i in z:
+            samples = self.texts[self.training_samples_prediction_ == i]
+            s = str(i[0]) if topic_names == None else i[1]
+            s = "Topic: " + s
+            wordcloud = WordCloud(
+                background_color="white",
+                max_words=100,
+            ).generate("\n".join(list(samples)))
+            _ = plt.imshow(wordcloud, interpolation="bilinear")
+            _ = plt.title(f"Word Cloud ({s})", fontweight="bold", fontsize=30)
+            _ = plt.axis("off")
+            plt.show()
