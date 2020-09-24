@@ -97,7 +97,7 @@ class LDA:
         _ = ax.set_xlabel('Number of Topics')
         fig.show()
         
-        
+    # Default set of hyperparameter values for hyperparameter tuning
     num_topic_range = np.arange(2, 101, 10)
     alpha_range = list(np.arange(0.0, 1.1, 0.25))
     alpha_range.append("symmetric")

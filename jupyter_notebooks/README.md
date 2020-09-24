@@ -1,4 +1,4 @@
-## Acessing the Jupyter Notebooks
+## Accessing the Jupyter Notebooks
 
 Please open the Jupyter Notebooks using [Google Colab](https://colab.research.google.com) or by visiting the URLs listed below. [Google Colab](https://colab.research.google.com) is required because some plots does not render outside [Google Colab](https://colab.research.google.com)'s Python environment. If you insist in using a Python environment outside [Google Colab](https://colab.research.google.com), you'll need to delete one code cell and rerun the Jupyter Notebook.
 
