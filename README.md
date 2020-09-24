@@ -39,7 +39,7 @@ You can check this [Kanban Board](https://github.com/users/gstdl/projects/1) for
 
 The data used in this project is **scraped** from [Amazon India's website](https://www.amazon.in). The data used is review data of iPhone XR obtained from [this page](https://www.amazon.in/Apple-iPhone-XR-64GB-White/dp/B07JGXM9WN/ref=cm_cr_arp_d_bdcrb_top?ie=UTF8). The scraped data is saved in [scraped_data folder](scraped_data).
 
-**Why am I using review data when the practical example is customer complains?**
+**Why am I using review data when the practical example is customer complaints?**
 
 > I'm using review data because complaint data is not easy to obtain and the procedure to build the model will be almost the same.
 
