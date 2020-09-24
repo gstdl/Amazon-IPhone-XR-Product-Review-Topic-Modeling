@@ -1,8 +1,8 @@
 from gensim import corpora, models
 import pyLDAvis
 import pyLDAvis.gensim
-from plotly import graph_objects as go
-from numpy import arange, inf, random
+import numpy as np
+import matplotlib.pyplot as plt
 from tqdm import tqdm
 
 
@@ -83,11 +83,26 @@ class LDA:
                 )
             )
 
-    num_topic_range = arange(2, 101, 10)
-    alpha_range = list(arange(0.0, 1.1, 0.25))
+    def find_best_num_topics(self, num_topic_range=np.arange(2, 61, 1)):
+        self.tune(num_topic_range=num_topic_range, alpha_range=['symmetric'], beta_range=['symmetric'])
+        data = [(i['num_topics'], i['coherence_score']) for i in self.tuning_results_]
+        x, y = list(), list()
+        for k, cs in data:
+            x.append(k)
+            y.append(cs)
+        fig, ax = plt.subplots(figsize = (18, 6))
+        _ = ax.plot(x,y)
+        _ = ax.set_title('Optimal Number of Topics Grid Search')
+        _ = ax.set_ylabel('Coherence Score')
+        _ = ax.set_xlabel('Number of Topics')
+        fig.show()
+        
+        
+    num_topic_range = np.arange(2, 101, 10)
+    alpha_range = list(np.arange(0.0, 1.1, 0.25))
     alpha_range.append("symmetric")
     alpha_range.append("asymmetric")
-    beta_range = list(arange(0.0, 1.1, 0.25))
+    beta_range = list(np.arange(0.0, 1.1, 0.25))
     beta_range.append("symmetric")
 
     def tune(
@@ -106,9 +121,9 @@ class LDA:
                         {"num_topics": n_topic, "alpha": alpha, "beta": beta}
                     )
         if random_grid_search:
-            self.tuning_results_ = random.choice(self.tuning_results_, n, False)
+            self.tuning_results_ = np.random.choice(self.tuning_results_, n, False)
 
-        self.best_coherence_score_ = -inf
+        self.best_coherence_score_ = -np.inf
         idx_best_coherence_score = 0
         progress_bar = tqdm(range(len(self.tuning_results_)), desc="tuning")
         for i in progress_bar:

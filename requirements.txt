@@ -6,3 +6,6 @@ requests==2.24.0
 pandas==1.1.1
 beautifulsoup4==4.9.1
 pyLDAvis==2.1.2
+nltk==3.5
+wordcloud==1.8.0
+matplotlib==3.2.2
