@@ -3,12 +3,13 @@ import pyLDAvis
 import pyLDAvis.gensim
 import numpy as np
 import matplotlib.pyplot as plt
+from wordcloud import WordCloud
 from tqdm import tqdm
 
 
 class LDA:
-    def __init__(self, texts):
-        self.texts = texts
+    def __init__(self, training_samples):
+        self.texts = training_samples
         self.docs = [data.split() for data in texts]
         self.dictionary = corpora.Dictionary(self.docs)
         self.bow_corpus = [self.dictionary.doc2bow(doc) for doc in self.docs]
@@ -39,6 +40,7 @@ class LDA:
         passes=2,
         random_state=9,
         tuning=False,
+        predict_training_samples=False,
     ):
         self.model = models.ldamodel.LdaModel(
             self.bow_corpus,
@@ -67,6 +69,8 @@ class LDA:
         else:
             self.visualize_topics_ = 'Set tuning parameter in fit function to "False" to visualize LDA result!'
             return self.coherence_score_
+        if predict_training_samples:
+            self.training_samples_predict_proba_, self.training_samples_prediction_ = self.predict(self.texts, True)
 
     def print_output(self):
         for idx, topic in self.model.print_topics(-1):
@@ -84,19 +88,23 @@ class LDA:
             )
 
     def find_best_num_topics(self, num_topic_range=np.arange(2, 61, 1)):
-        self.tune(num_topic_range=num_topic_range, alpha_range=['symmetric'], beta_range=['symmetric'])
-        data = [(i['num_topics'], i['coherence_score']) for i in self.tuning_results_]
+        self.tune(
+            num_topic_range=num_topic_range,
+            alpha_range=["symmetric"],
+            beta_range=["symmetric"],
+        )
+        data = [(i["num_topics"], i["coherence_score"]) for i in self.tuning_results_]
         x, y = list(), list()
         for k, cs in data:
             x.append(k)
             y.append(cs)
-        fig, ax = plt.subplots(figsize = (18, 6))
-        _ = ax.plot(x,y)
-        _ = ax.set_title('Optimal Number of Topics Grid Search')
-        _ = ax.set_ylabel('Coherence Score')
-        _ = ax.set_xlabel('Number of Topics')
+        fig, ax = plt.subplots(figsize=(18, 6))
+        _ = ax.plot(x, y)
+        _ = ax.set_title("Optimal Number of Topics Grid Search")
+        _ = ax.set_ylabel("Coherence Score")
+        _ = ax.set_xlabel("Number of Topics")
         fig.show()
-        
+
     # Default set of hyperparameter values for hyperparameter tuning
     num_topic_range = np.arange(2, 101, 10)
     alpha_range = list(np.arange(0.0, 1.1, 0.25))
@@ -142,3 +150,27 @@ class LDA:
         else:
             self.fit(**self.best_params_)
             print("Finished hyperparameter tuning, model updated!")
+
+    def predict(self, test_sample, return_predict_proba=False):
+        sample_data_type = type(test_sample)
+        if sample_data_type == str:
+            test_sample = [test_sample]
+        predict_proba, predictions = list(), list()
+        for doc in test_sample:
+            test_vector = self.model.id2word.doc2bow(doc.split())
+            test_topics = self.model[test_vector]
+            pred_proba = np.zeros(self.best_params_["num_topics"])
+            for i, proba in test_topics:
+                pred_proba[i] = proba
+            predict_proba.append(pred_proba)
+            predictions.append(np.argmax(pred_proba))
+        if sample_data_type == str:
+            predict_proba = predict_proba[0]
+            predictions = predictions[0]
+        if return_predict_proba:
+            return predict_proba, predictions
+        else:
+            return predictions
+
+    def generate_topic_word_cloud(self, topics, topic_names):
+        pass
