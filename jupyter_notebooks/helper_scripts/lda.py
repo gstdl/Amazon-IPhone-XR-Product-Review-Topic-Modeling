@@ -56,15 +56,10 @@ class LDA:
         )
         # calculate perplexity score (the lower the better)
         self.perplexity_score_ = self.model.log_perplexity(self.bow_corpus)
-        # calculate coherence score (the higher the better)
-        self.coherence_model = models.CoherenceModel(
-            model=self.model,
-            texts=self.docs,
-            dictionary=self.dictionary,
-            coherence="c_v",
+        #         # calculate coherence score (the higher the better)
+        self.coherence_score_, self.coherence_score_per_topic_ = self.score(
+            self.docs, return_per_topic=True
         )
-        self.coherence_score_ = self.coherence_model.get_coherence()
-        self.coherence_score_per_topic_ = self.coherence_model.get_coherence_per_topic()
         if not tuning:
             pyLDAvis.enable_notebook()
             vis = pyLDAvis.gensim.prepare(self.model, self.bow_corpus, self.dictionary)
@@ -77,6 +72,21 @@ class LDA:
                 self.training_samples_predict_proba_,
                 self.training_samples_prediction_,
             ) = self.predict(self.texts, True)
+
+    def score(self, docs, model=None, coherence="c_v", return_per_topic=False):
+        if model == None:
+            model = self.model
+        # calculate coherence score (the higher the better)
+        cm = models.CoherenceModel(
+            model=model,
+            texts=docs,
+            dictionary=self.dictionary,
+            coherence=coherence,
+        )
+        if return_per_topic:
+            return cm.get_coherence(), cm.get_coherence_per_topic()
+        else:
+            return cm.get_coherence()
 
     def print_output(self):
         for idx, topic in self.model.print_topics(-1):
@@ -93,11 +103,12 @@ class LDA:
                 )
             )
 
-    def find_best_num_topics(self, num_topic_range=np.arange(2, 61, 1)):
+    def find_best_num_topics(self, num_topic_range=np.arange(2, 61, 1), random_state=9):
         self.tune(
             num_topic_range=num_topic_range,
             alpha_range=["symmetric"],
             beta_range=["symmetric"],
+            random_state=random_state,
         )
         data = [(i["num_topics"], i["coherence_score"]) for i in self.tuning_results_]
         x, y = list(), list()
@@ -126,6 +137,7 @@ class LDA:
         num_topic_range=num_topic_range,
         alpha_range=alpha_range,
         beta_range=beta_range,
+        random_state=9,
     ):
         self.tuning_results_ = list()
         for n_topic in num_topic_range:
@@ -141,7 +153,9 @@ class LDA:
         idx_best_coherence_score = 0
         progress_bar = tqdm(range(len(self.tuning_results_)), desc="tuning")
         for i in progress_bar:
-            coherence_score = self.fit(**self.tuning_results_[i], tuning=True)
+            coherence_score = self.fit(
+                **self.tuning_results_[i], tuning=True, random_state=random_state
+            )
             if coherence_score > self.best_coherence_score_:
                 self.best_coherence_score_ = coherence_score
                 self.best_params_ = self.tuning_results_[i].copy()
@@ -154,7 +168,7 @@ class LDA:
                 }
             )
         else:
-            self.fit(**self.best_params_)
+            self.fit(**self.best_params_, random_state=random_state)
             print("Finished hyperparameter tuning, model updated!")
 
     def predict(self, test_sample, return_predict_proba=False):
