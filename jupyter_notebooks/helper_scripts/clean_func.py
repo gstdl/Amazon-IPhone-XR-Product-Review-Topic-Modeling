@@ -39,7 +39,7 @@ def clean(doc):
             or token.pos_ == "ADV"
         ):
             # stem and lemmatize text
-            t = token.lemma_
+            t = stemmer.stem(token.lemma_)
             normalized.append(t)
     normalized = " ".join(normalized)
     return normalized

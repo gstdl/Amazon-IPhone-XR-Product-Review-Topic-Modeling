@@ -103,11 +103,17 @@ class LDA:
                 )
             )
 
-    def find_best_num_topics(self, num_topic_range=np.arange(2, 61, 1), random_state=9):
+    def find_best_num_topics(
+        self,
+        num_topic_range=np.arange(2, 41, 1),
+        alpha="symmetric",
+        beta="symmetric",
+        random_state=9,
+    ):
         self.tune(
             num_topic_range=num_topic_range,
-            alpha_range=["symmetric"],
-            beta_range=["symmetric"],
+            alpha_range=[alpha],
+            beta_range=[beta],
             random_state=random_state,
         )
         data = [(i["num_topics"], i["coherence_score"]) for i in self.tuning_results_]
@@ -210,7 +216,7 @@ class LDA:
         if topic_names != None:
             assert (
                 hasattr(topic_names, "__iter__") or type(topic_names) == str
-            ), "topic_names must be an a strin, an iterable or None"
+            ), "topic_names must be an a string, an iterable or None"
             if type(topic_names) == str:
                 assert (
                     len(topics) == 1
@@ -223,7 +229,7 @@ class LDA:
             z = zip(topics, topic_names)
 
         for i in z:
-            samples = self.texts[self.training_samples_prediction_ == i]
+            samples = self.texts[self.training_samples_prediction_ == i[0]]
             s = str(i[0]) if topic_names == None else i[1]
             s = "Topic: " + s
             wordcloud = WordCloud(

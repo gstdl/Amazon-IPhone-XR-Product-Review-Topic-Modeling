@@ -1,7 +1,7 @@
 import pandas as pd
 import os
 from tqdm import tqdm
-from clean_func import clean
+from .clean_func import clean
 
 df = pd.read_parquet("../scraped_data/reviews.parquet.gzip")
 

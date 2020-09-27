@@ -11,3 +11,4 @@ spacy==2.3.2
 en_core_web_sm==2.3.1
 wordcloud==1.8.0
 matplotlib==3.2.2
+# tensorflow==2.2.0

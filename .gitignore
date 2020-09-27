@@ -3,3 +3,5 @@ __pychache__
 app
 *.pyc
 iframe_figures
+4*.ipynb
+tf_models
