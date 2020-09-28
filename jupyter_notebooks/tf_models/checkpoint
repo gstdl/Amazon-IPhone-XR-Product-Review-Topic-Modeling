@@ -1,0 +1,2 @@
+model_checkpoint_path: "bow_model.ckpt"
+all_model_checkpoint_paths: "bow_model.ckpt"
