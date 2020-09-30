@@ -7,16 +7,29 @@ from tqdm import tqdm
 
 
 def grab_review_rating(text):
+    """
+    Return rating score as a float.
+    """
     return float(text.replace(" out of 5 stars", "").strip())
 
 
 def grab_review_location_and_date(text):
+    """
+    Return location and text data
+    """
     location = re.sub("Reviewed in | on \d{1,2} \w+ \d{4}", "", text).strip()
     date = re.findall("\d{1,2} \w+ \d{4}", text)[0]
     return location, date
 
 
 def scrape(url):
+    """
+    Extract information containing review title,
+    review date, review location, review rating, and review text
+    from Amazon India's review page.
+
+    Returns a Pandas Dataframe
+    """
     page = requests.get(url)
     html = BeautifulSoup(page.text, "html.parser")
     review_titles = html.find_all(
