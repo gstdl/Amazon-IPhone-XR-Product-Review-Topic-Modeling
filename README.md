@@ -51,7 +51,7 @@ The data used in this project is **scraped** from [Amazon India's website](https
 
 1. Data Scraping / Crawling (Using BeautifulSoup)
 2. Data Visualization (Using Wordcloud, Matplotlib, & Plotly)
-3. Data Cleaning (Using Pandas, Numpy, & nltk)
+3. Data Cleaning (Using Pandas, Numpy, spacy, & nltk)
 4. Natural Language Processing - Topic Modeling (Using gensim)
 5. Object Oriented Programming (in Python)
 
